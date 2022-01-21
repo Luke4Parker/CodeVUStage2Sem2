@@ -20,6 +20,7 @@ namespace module_12_rest_api.Models
             var names = new[] { "Chair", "Car", "Computer", "Pants", "Shoes" };
             var departments = new[] { "Books", "Movies", "Music",
                                        "Games", "Electronics" };
+            var numberOfRelatedProducts = 0;
 
             context.Products.AddRange(500.Times(x =>
             {
@@ -28,6 +29,33 @@ namespace module_12_rest_api.Models
                 var name = names[rnd.Next(0, 5)];
                 var department = departments[rnd.Next(0, 5)];
                 var productId = $"{x,-3:000}";
+
+                List<RelatedProduct> relatedProducts = new List<RelatedProduct>();
+
+                var hasRelatedProduct = Convert.ToBoolean(rnd.Next(0, 2));
+                if (hasRelatedProduct)
+                {
+                    var numberRelatedProducts = rnd.Next(0, 5);
+                    for (int i = 0; i < numberRelatedProducts; i++)
+                    {
+                        numberOfRelatedProducts += 1;
+                        var radjective = adjectives[rnd.Next(0, 5)];
+                        var rmaterial = materials[rnd.Next(0, 5)];
+                        var rname = names[rnd.Next(0, 5)];
+                        var rdepartment = departments[rnd.Next(0, 5)];
+                        var rproductId = $"{x + 500 + numberOfRelatedProducts,-3:000}";
+
+                        relatedProducts.Add(new RelatedProduct
+                        {
+                            ProductNumber =
+                                $"{rdepartment.First()}{rname.First()}{rproductId}",
+                            Name = $"{radjective} {rmaterial} {rname}",
+                            Price = (double)rnd.Next(1000, 9000) / 100,
+                            Department = rdepartment
+                        });
+                    }
+
+                }
 
                 return new Product
                 {

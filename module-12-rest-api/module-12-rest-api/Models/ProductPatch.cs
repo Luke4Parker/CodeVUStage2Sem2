@@ -21,6 +21,9 @@ namespace module_12_rest_api.Models
 
         [Display(Name = "department")]
         public string Department { get; set; }
+
+        [Display(Name = "relatedProduct")]
+        public virtual List<RelatedProduct> RelatedProducts { get; set; }
     }
 }
 
