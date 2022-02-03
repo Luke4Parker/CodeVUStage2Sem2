@@ -24,6 +24,10 @@ namespace module_12_rest_api.Models
 
         [Display(Name = "relatedProduct")]
         public virtual List<RelatedProduct> RelatedProducts { get; set; }
+
+        [Display(Name = "dateUpdated")]
+        public DateTime DateUpdated { get; set; }
+
     }
 }
 

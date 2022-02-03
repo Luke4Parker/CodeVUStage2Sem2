@@ -14,5 +14,6 @@ namespace module_12_rest_api.Daos
         }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Seller> Sellers { get; set; }
     }
 }

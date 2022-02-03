@@ -9,6 +9,13 @@ namespace module_12_rest_api.Models
 {
     public static class ProductSeed
     {
+        public static DateTime RandomDay(Random gen)
+        {
+            DateTime start = new DateTime(1995, 1, 1);
+            int range = (DateTime.Today - start).Days;
+            return start.AddDays(gen.Next(range));
+        }
+
         public static void InitData(ProductContext context)
         {
             var rnd = new Random();
@@ -21,14 +28,16 @@ namespace module_12_rest_api.Models
             var departments = new[] { "Books", "Movies", "Music",
                                        "Games", "Electronics" };
             var numberOfRelatedProducts = 0;
-
+            
             context.Products.AddRange(500.Times(x =>
             {
+
                 var adjective = adjectives[rnd.Next(0, 5)];
                 var material = materials[rnd.Next(0, 5)];
                 var name = names[rnd.Next(0, 5)];
                 var department = departments[rnd.Next(0, 5)];
                 var productId = $"{x,-3:000}";
+                var dateUpdated = RandomDay(rnd);
 
                 List<RelatedProduct> relatedProducts = new List<RelatedProduct>();
 
@@ -52,6 +61,7 @@ namespace module_12_rest_api.Models
                             Name = $"{radjective} {rmaterial} {rname}",
                             Price = (double)rnd.Next(1000, 9000) / 100,
                             Department = rdepartment
+
                         });
                     }
 
@@ -61,13 +71,46 @@ namespace module_12_rest_api.Models
                 {
                     ProductNumber =
                      $"{department.First()}{name.First()}{productId}",
-                    Name = $"{adjective} {material} {name}",
+                    ProductName = $"{adjective} {material} {name}",
                     Price = (double)rnd.Next(1000, 9000) / 100,
-                    Department = department
+                    Department = department,
+                    DateUpdated = dateUpdated,
+                    RelatedProducts = relatedProducts
+                };
+            }));
+            context.SaveChanges();
+            var sellers = new[] { "SellsALot", "FormerlyKMart", "WallyWurld", "JupiterJeans", "Howard-Franklin" };
+            var id = 1;
+            context.Sellers.AddRange(3.Times(s =>
+            {
+
+                var seller = sellers[rnd.Next(0, 5)];
+                var sellerId = id;
+                id++;
+
+                //Builds the Inventory list for the seller
+                List<InventoryItem> inventory = new List<InventoryItem>();
+                foreach (Product product in context.Products)
+                {
+                    inventory.Add(new InventoryItem
+                    {
+                        SellerName = seller,
+                        ProductNumber = product.ProductNumber,
+                        NumberHeld = 100,
+                        NumberSold = 0
+                    });
+                }
+
+                return new Seller
+                {
+                    SellerName = seller,
+                    SellerId = sellerId.ToString(),
+                    Inventory = inventory
                 };
             }));
 
             context.SaveChanges();
+
         }
     }
 }

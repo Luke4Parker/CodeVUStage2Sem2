@@ -85,6 +85,7 @@ namespace module_12_rest_api.Controllers
             {
                 var productList = _context.Products as IQueryable<Product>;
                 var product = productList.First(p => p.ProductNumber.Equals(productNumber));
+                newProduct.DateUpdated = DateTime.Today;
 
                 _context.Products.Remove(product);
                 _context.Products.Add(newProduct);
@@ -120,6 +121,35 @@ namespace module_12_rest_api.Controllers
                 return ValidationProblem(e.Message);
             }
         }
+        [HttpDelete]
+        [Route("DeleteOldProduct")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult DeleteOldProduct()
+        {
+            var deleteTime = new DateTime(2000, 1, 1);
+            try
+            {
+                var productList = _context.Products as IQueryable<Product>;
+                
+
+                foreach (Product oldProduct in productList)
+                {
+                    if (oldProduct.DateUpdated < deleteTime)
+                    {
+                        _context.Products.Remove(oldProduct);                       
+                    }
+                }
+                _context.SaveChanges();
+
+                return Ok(); 
+            }
+            catch (Exception e)
+            {
+                // Typically an error log is produced here
+                return ValidationProblem(e.Message);
+            }
+        }
         [HttpPatch]
         [Route("{productNumber}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -133,9 +163,10 @@ namespace module_12_rest_api.Controllers
 
                 product.ProductNumber = newProduct.ProductNumber ?? product.ProductNumber;
                 product.Department = newProduct.Department ?? product.Department;
-                product.Name = newProduct.Name ?? product.Name;
+                product.ProductName = newProduct.Name ?? product.ProductName;
                 product.Price = newProduct.Price ?? product.Price;
                 product.RelatedProducts = newProduct.RelatedProducts ?? product.RelatedProducts;
+                product.DateUpdated = DateTime.Today;
 
                 _context.Products.Update(product);
                 _context.SaveChanges();
@@ -160,6 +191,31 @@ namespace module_12_rest_api.Controllers
                 var product = productList.First(p => p.ProductNumber.Equals(productNumber));
 
                 product.RelatedProducts.Add(relatedProduct);
+                
+
+                _context.Products.Update(product);
+                _context.SaveChanges();
+
+                return new CreatedResult($"/products/{product.ProductNumber.ToLower()}", product);
+            }
+            catch (Exception e)
+            {
+                // Typically an error log is produced here
+                return ValidationProblem(e.Message);
+            }
+        }
+        [HttpPatch]
+        [Route("{productNumber}/Reviews")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Product> AddReview([FromRoute] string productNumber, [FromBody] Review review)
+        {
+            try
+            {
+                var productList = _context.Products as IQueryable<Product>;
+                var product = productList.First(p => p.ProductNumber.Equals(productNumber));
+
+                product.Reviews.Add(review);
 
                 _context.Products.Update(product);
                 _context.SaveChanges();

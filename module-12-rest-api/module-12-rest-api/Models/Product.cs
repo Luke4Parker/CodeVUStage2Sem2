@@ -14,8 +14,8 @@ namespace module_12_rest_api.Models
         public string ProductNumber { get; set; }
 
         [Required]
-        [Display(Name = "name")]
-        public string Name { get; set; }
+        [Display(Name = "productName")]
+        public string ProductName { get; set; }
 
         [Required]
         [Range(10, 90)]
@@ -28,6 +28,14 @@ namespace module_12_rest_api.Models
         [Required]
         [Display(Name = "relatedProducts")]
         public virtual List<RelatedProduct> RelatedProducts { get; set; }
+
+        [Required]
+        [Display(Name = "reviews")]
+        public virtual List<Review> Reviews { get; set; }
+
+        [Required]
+        [Display(Name = "dateUpdated")]
+        public DateTime DateUpdated { get; set; }
 
 
     }
